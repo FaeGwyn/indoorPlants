@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Indoor Plant Care</title>
+    <link href="styles.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="/images/wateringCan.png">
+
+    <!-- jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+        // allows the user to click on a plant or the name of the lighting type in the living room
+        // to learn more information about the respective plant/lighting. An animation has been added to scroll to the where
+        // the description is being output to ensure the user will see the information change.
+
+            $('.plant, .placement').click(function() {
+                //remove the currently active information
+                $('.info').removeClass('active');
+                
+                //check if it is lighting or plant that has been clicked on and show the matching description
+                if( $(this).attr("data-plant") ){
+                    $('[data-plant="' + $(this).data('plant') + '"]').addClass('active');
+                } else if ( $(this).attr("data-lighting") ){
+                    $('[data-lighting="' + $(this).data('lighting') + '"]').addClass('active');
+                }
+
+                //scroll to make sure the description is visible
+                let target = $('.descriptions').position().top; 
+                $('html, body').stop().animate({ scrollTop: target }, { duration: 500});
+            });
+
+        // making plants draggable and droppable
+            $('.plant').draggable({
+                revert: 'true',
+                helper: 'clone', //clone means that the plants stay in the scroll bar
+                start: function(event, ui) {
+                    $(ui.helper).css({
+                        opacity: 0.5
+                    })
+                }
+            });
+         
+            $('.droppable').droppable({
+                accept: '.plant',
+                tolerance: 'intersect',
+                drop: function(event, ui) {
+                // setting variables for readability in function
+                    let ogPlant = ui.draggable;
+                    let plant = ui.helper.clone();
+                    let jplant = $(plant);
+                    let room = $(this).parent()
+                    let roomHeight = $(this).parent().height();
+                    let dropBoxX = $(this).position().left;
+                    let dropBoxY = $(this).position().top;
+                    let dropBoxHeight = $(this).height();
+                    let dropBoxWidth = $(this).width();
+                    let dropBoxBottom = roomHeight - dropBoxY - dropBoxHeight;
+                    let plantHeight = ogPlant.height();
+                    let plantWidth = ogPlant.width();
+                    let plantTop = roomHeight - dropBoxBottom - plantHeight;
+                    let plantOffsetY = 0;
+                    let plantOffsetX = 0;
+                    
+                // check if the plants have any offset to align them nicer in the background
+                    if( $(ogPlant).attr('data-offsetY') ){
+                        plantOffsetY = parseFloat( $(ogPlant).attr('data-offsetY') );   
+                    } else if( $(ogPlant).attr('data-offsetX') ){
+                        plantOffsetX = parseFloat( $(ogPlant).attr('data-offsetX') );   
+                    }
+
+                // give a new class to identify it later for reset of plants
+                    jplant.addClass('inImage')
+
+                // add the plant in to the background image
+                    room.append(jplant);
+
+                // snap the plant to position over the pot
+                    $(plant).css({
+                        position: 'absolute',
+                        top: plantTop + plantOffsetY,
+                        left: dropBoxX + plantOffsetX + (dropBoxWidth - plantWidth)/2,
+                        opacity: 1
+                    })
+                
+                // make this droppable zone no longer available after it is filled with a plant
+                    $(this).droppable('disable');
+                }
+            });
+
+            $('.reset').click(function() {
+                // remove the plant from the background
+                    $('.inImage').remove();
+                    $('.droppable').droppable('enable');
+            });
+            
+
+        // CUSTOM SCROLL BAR
+            // two white divs on either side hide the plants from view
+            // using  a timer and buttons, the plants are moved across the screen
+            // mousedown and mouseup allows a cleaner 'animation'
+            let timer = null;
+
+            $('#scrollRight').mousedown(function () {
+                let limit = $('#nursery').get(0).scrollWidth - $('#plantScroller').width() + 25;
+                timer = setInterval(function () {
+                    let scrollPos = parseFloat( $('div#nursery').css('left') );
+                    scrollPos = scrollPos - 5;
+                    console.log(scrollPos);
+                    if (scrollPos < -limit) {
+                        scrollPos = -limit;
+                    }
+                    $('div#nursery').css('left', scrollPos);
+                }, 25);
+            });
+
+            $('#scrollRight').mouseup(function () {
+                clearInterval(timer);
+            })
+
+            $('#scrollLeft').mousedown(function () {
+                timer = setInterval(function () {
+                    let scrollPos = parseFloat($('div#nursery').css('left'));
+                    scrollPos = scrollPos + 5;
+                    console.log(scrollPos);
+                    if (scrollPos > 25) {
+                        scrollPos = 25;
+                    }
+                    $('div#nursery').css('left', scrollPos);
+                }, 25);
+            })
+
+            $('#scrollLeft').mouseup(function () {
+                clearInterval(timer);
+            })
+        
+        })
+
+
+    </script>
+</head>
+
+<body>
+    <main>
+        <header>
+            <h1>indoor plants</h1>
+            <h2>WITH BENEFITS</h2>
+        </header>
+
+        <section class="homepage">
+            <p>Indoor plants provide a multitude of benefits, enhancing not only the aesthetics
+                but also the overall quality of your living or working space.
+                They improve air quality by absorbing carbon dioxide and releasing oxygen while
+                removing toxins, promoting better health and a sense of well-being.
+                Indoor plants regulate humidity, reduce stress, and boost focus and productivity,
+                making your environment more inviting and soothing.
+            </p>
+            <p>They also offer mental health
+                benefits, serve as natural décor elements, and can absorb background noise.
+                Additionally, certain plants can enhance sleep quality and stimulate creativity,
+                fostering a stronger connection with nature, while also aiding in temperature
+                regulation and air circulation.
+            </p>
+            <p>To maximise these advantages, it's crucial to
+                choose the right plants and provide them with proper care tailored to your
+                specific environment.
+            </p>
+        </section>
+
+        <section class="more-info">
+            <h3>IMPROVED AIR QUALITY AND TEMPERATURE</h3>
+            <p>Indoor plants help purify the air by absorbing carbon dioxide and releasing oxygen 
+                through photosynthesis. They also filter out toxins like formaldehyde, benzene, 
+                and ammonia, thus enhancing the overall air quality in your space. Many indoor 
+                plants release moisture through a process known as transpiration, which can help 
+                increase the humidity levels in indoor environments. This is useful during dry 
+                winters and hot summer months.
+            </p>
+        
+            <h3>BETTER MENTAL HEALTH</h3>
+            <p>Caring for indoor plants can have a positive impact on mental health, reducing 
+                symptoms of anxiety and depression. The act of nurturing and tending to plants 
+                can be therapeutic and fulfilling. Studies have shown that the presence of indoor 
+                plants can reduce stress, lower blood pressure, and promote a sense of well-being.
+            </p>
+
+            <h3>ENHANCED FOCUS AND PRODUCTIVITY</h3>
+            <p> Indoor plants can improve concentration and productivity by creating a more 
+                inviting and pleasant environment. This can lead to a more focused and efficient 
+                work or living space.
+            </p>
+        </section>
+
+        <h2 class="interactive-details">INDOOR PLANT PLACEMENT</h2>
+
+        <section class="descriptions">
+
+            <section class="interactive-details info active">
+                <p>Now that you know a little more about indoor plants and their benefits you need
+                    to know where to place your plants in your space to make sure that your plants
+                    are happy and thriving. This will ensure you reap all of the benefits!
+                </p>    
+                <p>Scroll through the range on indoor plants and click on them to find out a little
+                    bit more about them. This information should guide you on where to place them in
+                    the living area space below.
+                </p>
+                <p>You are also able to click on the different lighting labels in the living room image
+                    to get a better understanding of what this light means for plants and how to recognise 
+                     it in your own space.
+                </p>
+            </section>
+
+            <!-- lighting descriptions -->
+            <section data-lighting="direct" class="info">
+                <h3>DIRECT LIGHTING</h3>
+                <p>Direct lighting is when light exposure where plants receive sunlight that
+                    is unobstructed and hits the plant directly without any barriers or diffusing elements. Direct
+                    light provides a significant amount of sunlight for an extended period during the day. It
+                    is most common during the midday when the sun is at its peak.
+                </p>
+            </section>
+            <section data-lighting="brightIndirect" class="info">
+                <h3>BRIGHT INDIRECT LIGHTING</h3>
+                <p>Bright indirect light means that the plant receives a significant amount
+                    of light but not direct sunlight. It's the level of light you might find near a window
+                    where the sun's rays are filtered or diffused by a sheer curtain, blinds, or other
+                    obstructions. This provides a well-lit environment without exposing the plant to intense, unfiltered
+                    sunlight. Bright indirect light conditions are relatively stable throughout the day, and the
+                    plant receives consistent, even illumination.
+                </p>
+            </section>
+            <section data-lighting="mediumIndirect" class="info">
+                <h3>MEDIUM INDIRECT LIGHTING</h3>
+                <p>Medium indirect light provides a moderate amount of light intensity. It's
+                    not as intense as direct sunlight but is brighter than what is considered low light. The
+                    light in this category is typically diffuse and even, without direct sun exposure. Plants in
+                    medium indirect light receive a consistent and relatively even distribution of light throughout the day.
+                </p>
+            </section>
+            <section data-lighting="low" class="info">
+                <h3>LOW LIGHTING</h3>
+                <p>Low light means that the amount of natural light reaching the plant is
+                    significantly reduced compared to bright or direct light. The environment is often dimly
+                    lit, and plants in low light may not receive direct sunlight at any point during the
+                    day. Low light conditions are often found in areas far from windows or in rooms with small or
+                    obstructed windows, such as hallways or bathrooms. The light levels can also be
+                    diminished by tall buildings or trees outside the window.
+                </p>
+            </section>
+            <section data-lighting="growLight" class="info">
+                <h3>GROW LIGHTS</h3>
+                <p>Grow lights are used to supplement or replace natural sunlight, especially in indoor environments 
+                    where natural light may be limited or inadequate. Grow lights are designed to emit specific wavelengths 
+                    of light, including blue and red light, and can be adjusted to provide the appropriate light
+                    intensity for plants.
+                </p>
+            </section>
+
+            <!-- plant descriptions -->
+            <section data-plant="alocasia" class="info">
+                <h3>AFRICAN MASK PLANT</h3>
+                <p>Sci. name: Alocasia x amazonica</p>
+                <p>These plants are appreciated for their striking and unique foliage, making them popular choices for indoor and 
+                    outdoor gardens. Alocasia plants thrive in bright, indirect light. Avoid direct sunlight, as it can scorch their 
+                    leaves. They can adapt to lower light conditions but may not grow as vigorously.
+                </p>
+                <p>Keep the soil consistently moist but not waterlogged. Allow the top inch of the soil to dry out between 
+                    waterings. Reduce watering during the winter when growth slows down.
+                </p>
+                <p>Alocasias are considered toxic to pets, so be cautious if you have cats or dogs in your home.
+
+                </p>
+            </section>
+
+            <section data-plant="aloeVera" class="info">
+                <h3>ALOE VERA</h3>
+                <p>Scientific name: Aloe vera</p>
+                <p>Aloe vera is a popular succulent plant known for its medicinal properties and easy care requirements. When 
+                    kept indoors, it can thrive with the right care. Aloe vera can tolerate some direct sunlight, but be cautious 
+                    of intense afternoon sun, which can scorch the leaves.
+                </p>
+                <p>Plant your aloe vera in a well-draining potting mix designed for succulents or cacti. Ensure the pot has 
+                    drainage holes to prevent waterlogged soil, which can lead to root rot. Aloe vera is drought-tolerant and 
+                    prefers to dry out between waterings. Water thoroughly but allow the top 1-2 inches of the soil to dry 
+                    out before watering again. The frequency of watering will depend on factors like the season and the 
+                    humidity in your home.
+                </p>
+            </section>
+
+            <section data-plant="birdOfParadise" class="info">
+                <h3>BIRD OF PARADISE</h3>
+                <p>Scientific name: Strelitzia</p>
+                <p>Bird of Paradise plants are a stunning indoor plant known for its large, banana-like leaves and unique tropical 
+                    appearance. They require bright, indirect light to thrive. Place them near a sunny window where they 
+                    receive plenty of bright, filtered sunlight. They can tolerate some direct light, but try to limit afternoon 
+                    light as it can scorch the leaves. 
+                </p>
+                <p>Allow the top 1-2 inches of the soil to dry out before watering. Bird of Paradise plants prefer to be kept 
+                    moderately moist during the growing season (spring and summer) and drier in the winter. Bird of Paradise 
+                    plants appreciate higher humidity levels. Increase humidity by misting the leaves regularly or using a humidity 
+                    tray.
+                </p>
+            </section>
+
+            <section data-plant="birdsNestFern" class="info">
+                <h3>BIRD'S NEST FERN</h3>
+                <p>Scientific name: Asplenium nidus</p>
+                <p>Bird's Nest Ferns are popular and attractive indoor plant known for their lush, wavy fronds and ease of care. 
+                    These plants thrive in low to medium indirect light. They are adapted to grow under the canopy of larger 
+                    trees in their native rainforest environments, so they prefer filtered light. 
+                </p>
+                <p>Keep the soil evenly moist but not waterlogged. Water when the top inch of the soil feels slightly dry to the 
+                    touch. Use lukewarm water to avoid shocking the plant with cold water. Reduce watering in the winter months 
+                    when the plant is in a dormant phase. Prune away any dead or yellowing fronds to encourage new growth. Remove 
+                    spent or damaged leaves as they occur.
+                </p>
+            </section>
+
+            <section data-plant="bostonFern" class="info">
+                <h3>BOSTON FERN</h3>
+                <p>Sci. name: Nephrolepis exaltata</p>
+                <p>Boston Ferns are popular indoor plants appreciated for their lush, feathery fronds. They are adaptable plants that 
+                    thrive in medium and bright, indirect sunlight. Prolonged exposure to bright direct sunlight may burn and scorch 
+                    their leaves.
+                </p>
+                <p>Keep the soil evenly moist but not waterlogged. Water your Boston fern when the top 1-2 inches of the soil feels 
+                    slightly dry to the touch. Water thoroughly, allowing excess water to drain from the pot, and empty the saucer to 
+                    prevent root rot. Prune dead or yellowing fronds regularly to encourage new growth and keep your Boston fern 
+                    looking its best.
+                </p>
+            </section>
+
+            <section data-plant="cactus" class="info">
+                <h3>CACTUS</h3>
+                <p>Sci. name: Cactaceae</p>
+                <p>Cactus plants are known for their low-maintenance requirements, making them excellent choices for indoor gardening.
+                    Cacti thrive in bright, direct sunlight. Place your cactus near a window where it can receive at least 6 hours of 
+                    direct sunlight per day. If you don't have access to strong natural light, you can use a grow light to supplement.
+                </p>
+                <p>Plant your cactus in a well-draining cactus or succulent potting mix. Ensure the pot has drainage holes to prevent 
+                    water from pooling at the bottom, which can lead to root rot. Cacti are drought-tolerant and should be allowed to 
+                    dry out between waterings. Water sparingly, and only when the top 1-2 inches of soil are completely dry. 
+                    Overwatering is one of the most common causes of cactus problems.
+                </p>
+            </section>
+
+            <section data-plant="fiddleLeafFig" class="info">
+                <h3>FIDDLE LEAF FIG</h3>
+                <p>Sci. name: Ficus lytara</p>
+                <p>Popular indoor plants known for their large, lush, violin-shaped leaves. Fiddle leaf figs require bright, indirect 
+                    light to thrive. Place them near a sunny window where they receive plenty of bright, filtered sunlight. Avoid direct 
+                    sunlight, as it can scorch the leaves.
+                </p>
+                <p>Keep the soil consistently moist but not waterlogged. Water thoroughly and allow the top inch of the soil to dry out 
+                    between waterings. Be cautious not to overwater, as it can lead to root rot. Reduce watering during the winter when 
+                    growth slows down.
+                </p>
+            </section>
+
+            <section data-plant="monsteraDeliciosa" class="info">
+                <h3>MONSTERA DELICIOSA</h3>
+                <p>Sci. name: Monstera delciosa</p>
+                <p>Often referred to as the Swiss cheese plant, this is a popular and visually striking indoor plant known for its unique 
+                    fenestrated (holey) leaves. Your Monstera can grow just about anywhere in your home! It tolerates low light, but grows 
+                    faster and becomes more dramatic in a spot with indirect bright light. That said, avoid strong, direct sunlight 
+                    because it may burn the leaves. 
+                </p>
+                <p>Allow the top 1-2 inches of the soil to dry out before watering. Monstera deliciosa prefers to be kept moderately moist 
+                    during the growing season (spring and summer) and slightly drier in the winter. Be cautious not to overwater, as this 
+                    can lead to root issues.
+                </p>
+            </section>
+
+            <section data-plant="peaceLily" class="info">
+                <h3>PEACE LILY</h3>
+                <p>Sci. name: Spathiphyllum</p>
+                <p>Popular indoor plants known for their elegant white flowers and lush, dark green leaves. Peace lilies prefer bright, 
+                    indirect light. They can tolerate low light conditions, but they will thrive in moderate to bright, filtered sunlight. 
+                    Avoid placing them in direct sunlight, as it can scorch the leaves.
+                </p>
+                <p>Peace lilies like to be kept moderately moist, but they do not tolerate sitting in water. Water when the top inch of 
+                    the soil feels dry. Be cautious not to overwater. Yellowing leaves can be a sign of overwatering, while drooping 
+                    leaves indicate it needs a good drink.
+                </p>
+            </section>
+
+            <section data-plant="phalenopsisOrchid" class="info">
+                <h3>ORCHID</h3>
+                <p>Sci. name: Phalaenopsis</p>
+                <p>Phalaenopsis orchids, often referred to as "Moth Orchids," are popular indoor plants known for their stunning and 
+                    long-lasting flowers. These orchids are relatively low-maintenance when provided with the right care. Phalaenopsis 
+                    orchids thrive in bright, indirect light. Avoid exposing them to direct, intense sunlight, as it can scorch the leaves.
+                    Grow lights are an easy way to supplement the correct lighting for these plants.
+                </p>
+                <p>Water your orchid carefully. Allow the potting medium to dry out slightly between waterings. Typically, it's best to 
+                    water once a week, but this can vary depending on factors such as temperature and humidity. Water thoroughly, and 
+                    ensure excess water can drain from the pot.
+                </p>
+            </section>
+
+            <section data-plant="pothos" class="info">
+                <h3>DEVIL'S IVY</h3>
+                <p>Sci. name: Epipremnum aureum</p>
+                <p>Sometimes called pothos, this is a popular and low-maintenance indoor plant known for its heart-shaped leaves and trailing 
+                    growth. Devil's Ivy is adaptable to various light conditions, but it thrives in moderate to bright, indirect light. It 
+                    can tolerate some low light, but its growth may slow down. Avoid direct sunlight, which can scorch the leaves.
+                </p>
+                <p>Water your Devil's Ivy thoroughly but allow the top inch or two of the soil to dry out between waterings. It's better 
+                    to underwater than overwater. Trim or pinch back your Devil's Ivy to encourage bushier growth and prevent it from 
+                    becoming too leggy. Pruning is also useful for removing any yellow or damaged leaves.
+                </p>
+            </section>
+
+            <section data-plant="sansevieria" class="info">
+                <h3>MOTHER-IN-LAW'S TONGUE</h3>
+                <p>Sci. name: Sansevieria</p>
+                <p>Commonly known as the snake plant or mother-in-law's tongue, this is a hardy and low-maintenance indoor plant. It's an 
+                    excellent choice for beginners and those who want a resilient houseplant. Sansevieria can tolerate a wide range of lighting 
+                    conditions and is an excellent choice for low-light spaces. It can thrive in low light, but it will also grow in bright, 
+                    indirect light. However, direct sunlight, which can scorch the leaves or discolour the leaves.
+                </p>
+                <p>Sansevieria is highly drought-tolerant. Allow the soil to dry out completely between waterings. Water sparingly and err on 
+                    the side of underwatering. These plants don't typically require pruning. You can remove dead or yellowing leaves at the base 
+                    if needed to maintain the plant's appearance.
+                </p>
+            </section>
+
+            <section data-plant="swissCheesePlantVine" class="info">
+                <h3>MINI MONSTERA</h3>
+                <p>Sci. name: Rhaphidophora tetrasperma</p>
+                <p>Also known as the "Monstera Ginny" or "Philodendron Piccolo," this popular indoor plant is appreciated for its lush, split leaves 
+                    and relatively compact size compared to its larger relative, the Swiss cheese plant (Monstera deliciosa). These plants are 
+                    adaptable and can tolerate a range of lighting conditions, making them suitable for various indoor settings. These plants can thrive 
+                    in medium indirect lighting indoors, tolerate low lighting, but do best in bright-indirect lighting. 
+                </p>
+                <p>Keep the soil consistently moist but not soggy. Water thoroughly when the top inch of the soil feels dry. Prune your Mini Monstera to 
+                    encourage bushier growth and remove any yellow or damaged leaves. You can also use stakes or supports to train it to climb or trail 
+                    as desired.</p>
+            </section>
+
+            <section data-plant="zanzibar" class="info">
+                <h3>ZANZIBAR GEM</h3>
+                <p>Sci. name: Zamioculcas zamiifolia</p>
+                <p>Sometimes referred to as the ZZ plant, this popular indoor plant is known for its tolerance to a wide range of indoor conditions and 
+                    minimal care requirements. Zanzibar Gems are incredibly adaptable when it comes to light. They can thrive in low to bright, indirect 
+                    light. The Zanzibar Gem is often chosen for low-light spaces due to their ability to tolerate low light conditions, though they tend 
+                    to grow more slowly in such environments.
+                </p>
+                <p>One of the key factors in caring for a ZZ plant is not overwatering. They are highly drought-tolerant and prefer to dry out between 
+                    waterings. Water the plant thoroughly, allowing excess water to drain from the pot, and then let the soil dry out before watering 
+                    again. It's better to underwater than overwater this plant.
+                </p>
+            </section>
+
+        </section>
+
+
+        <section class="plant-positions">
+            <div id="plantScroller">
+                <div id="leftBlock">
+                    <button id="scrollLeft"><</button>
+                </div>
+                <div id="nursery">
+                    <!-- plants are set with data-plant to link to description and data-offsetX/Y for their placement in the background -->
+                    <img src="/images/alocasia.png" alt="Alocasia" class="plant" data-plant="alocasia">
+                    <img src="/images/aloeVera.png" alt="Aloe Vera" class="plant" data-plant="aloeVera">
+                    <img src="/images/birdOfParadise.png" alt="Bird of Paradise" class="plant" data-plant="birdOfParadise" data-offsetX="15">
+                    <img src="/images/birdsNestFern.png" alt="Birds Nest Fern" class="plant" data-plant="birdsNestFern" data-offsetX="-5">
+                    <img src="/images/bostonFern.png" alt="Boston Fern" class="plant" data-plant="bostonFern">
+                    <img src="/images/cactus.png" alt="Cactus" class="plant" data-plant="cactus">
+                    <img src="/images/fiddleLeafFig.png" alt="Fiddle Leaf Fig" class="plant" data-plant="fiddleLeafFig" data-offsetX="-6">
+                    <img src="/images/monsteraDelicosia.png" alt="Monstera Deliciosa" class="plant" data-plant="monsteraDeliciosa">
+                    <img src="/images/peaceLily.png" alt="Peace Lily" class="plant" data-plant="peaceLily" data-offsetX="-6">
+                    <img src="/images/phalenopsisOrchid.png" alt="Orchid" class="plant" data-plant="phalenopsisOrchid">
+                    <img src="/images/pothos.png" alt="Devil's Ivy" class="plant" data-plant="pothos" data-offsetY="45">
+                    <img src="/images/sansevieria.png" alt="Sansevieria" class="plant" data-plant="sansevieria">
+                    <img src="/images/swissCheesePlantVine.png" alt="Swiss Cheese Plant Vine" class="plant" data-plant="swissCheesePlantVine" data-offsetX="19">
+                    <img src="/images/zanzibar.png" alt="zanzibar" class="plant" data-plant="zanzibar" data-offsetX="10">
+                </div>
+                <div id="rightBlock">
+                    <button id="scrollRight">></button>
+                </div>
+            </div>
+                
+            <section class="background">
+                <!-- these are the empty divs to be placed on the background image, 
+                    allowing the user to click lighting and get the respective descriptions.
+                    as well as the droppable zones for the plants to be dragged in to 
+                -->
+                <div class="direct placement" data-lighting="direct"></div>
+                <div class="brightIndirect placement" data-lighting="brightIndirect"></div>
+                <div class="mediumIndirect placement" data-lighting="mediumIndirect"></div>
+                <div class="low placement" data-lighting="low"></div>
+                <div class="growLight placement" data-lighting="growLight"></div>
+
+                <div id="one" class="droppable direct"></div>
+                <div id="two" class="droppable direct"></div>
+                <div id="three" class="droppable direct bright-indirect"></div>
+                <div id="four" class="droppable bright-indirect"></div>
+                <div id="five" class="droppable medium-indirect"></div>
+                <div id="six" class="droppable medium-indirect"></div>
+                <div id="seven" class="droppable medium-indirect"></div>
+                <div id="eight" class="droppable bright-indirect"></div>
+                <div id="nine" class="droppable low"></div>
+                <div id="ten" class="droppable low"></div>
+                <div id="eleven" class="droppable low"></div>
+                <div id="twelve" class="droppable low"></div>
+                <div id="thirteen" class="droppable low"></div>
+                <div id="fourteen" class="droppable low"></div>
+
+                <button class="reset">Reset Plants</button>
+            </section>
+                
+        </section>
+
+        <section class="glossary">
+            <h1>Glossary</h1>
+            <h2>PLANTS</h2>
+            <img src="/images/alocasia.png" alt="Alocasia" data-plant="alocasia"> 
+            <img src="/images/aloeVera.png" alt="Aloe Vera" data-plant="aloeVera">
+            <img src="/images/birdOfParadise.png" alt="Bird of Paradise" data-plant="birdOfParadise">
+            <img src="/images/birdsNestFern.png" alt="Birds Nest Fern" data-plant="birdsNestFern">
+            <img src="/images/bostonFern.png" alt="Boston Fern" data-plant="bostonFern">
+            <img src="/images/cactus.png" alt="Cactus" data-plant="cactus">
+            <img src="/images/fiddleLeafFig.png" alt="Fiddle Leaf Fig" data-plant="fiddleLeafFig">
+            <img src="/images/monsteraDelicosia.png" alt="Monstera Deliciosa" data-plant="monsteraDeliciosa">
+            <img src="/images/peaceLily.png" alt="Peace Lily" data-plant="peaceLily">
+            <img src="/images/phalenopsisOrchid.png" alt="Orchid" data-plant="phalenopsisOrchid">
+            <img src="/images/pothos.png" alt="Devil's Ivy" data-plant="pothos">
+            <img src="/images/sansevieria.png" alt="Sansevieria" data-plant="sansevieria">
+            <img src="/images/swissCheesePlantVine.png" alt="Swiss Cheese Plant Vine" data-plant="swissCheesePlantVine">
+            <img src="/images/zanzibar.png" alt="zanzibar" data-plant="zanzibar">
+
+            <h2>LIGHTING</h2>
+        </section>
+    </main>
+</body>
+
+</html>
